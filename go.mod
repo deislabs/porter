@@ -23,6 +23,10 @@ replace (
 	// jsonschema lock
 	github.com/qri-io/jsonschema => github.com/carolynvs/jsonschema v0.2.1-0.20201229145510-cc593f443fdb
 
+	// pr239-fix-memmap-rename-dir
+	// https://github.com/spf13/afero/pull/239 + fixes
+	github.com/spf13/afero => github.com/getporter/afero v1.2.3-0.20210106151829-9adb084dc832
+
 	golang.org/x/sys => golang.org/x/sys v0.0.0-20190830141801-acfa387b8d69
 )
 
@@ -32,7 +36,7 @@ require (
 	github.com/PuerkitoBio/goquery v1.5.0 // indirect
 	github.com/carolynvs/aferox v0.2.1
 	github.com/carolynvs/datetime-printer v0.2.0
-	github.com/carolynvs/magex v0.2.1-0.20201116013928-d6af240c802c
+	github.com/carolynvs/magex v0.3.1-0.20201231144157-18bcbf7fb1fa
 	github.com/cbroglie/mustache v1.0.1
 	github.com/cnabio/cnab-go v0.15.0
 	github.com/cnabio/cnab-to-oci v0.3.1-beta1

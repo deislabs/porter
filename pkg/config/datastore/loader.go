@@ -45,7 +45,7 @@ func FromConfigFile(cfg *config.Config) error {
 
 func buildDataLoader(viperCfg func(v *viper.Viper)) config.DataStoreLoaderFunc {
 	return func(cfg *config.Config) error {
-		home, _ := cfg.GetHomeDir()
+		home := cfg.GetHomeDir()
 
 		v := viper.New()
 		v.SetFs(cfg.FileSystem)

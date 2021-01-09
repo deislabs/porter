@@ -1,9 +1,11 @@
 package porter
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"math/rand"
+	"path"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -22,7 +24,6 @@ import (
 	"github.com/cnabio/cnab-go/bundle"
 	cnabcreds "github.com/cnabio/cnab-go/credentials"
 	"github.com/stretchr/testify/require"
-	"gopkg.in/yaml.v2"
 )
 
 type TestPorter struct {
@@ -52,7 +53,7 @@ func NewTestPorter(t *testing.T) *TestPorter {
 
 	p := New()
 	p.Config = tc.Config
-	p.Mixins = mixin.NewTestMixinProvider()
+	p.Mixins = mixin.NewTestMixinProvider(tc)
 	p.Plugins = plugins.NewTestPluginProvider()
 	p.Cache = testCache
 	p.Builder = NewTestBuildProvider()
@@ -95,18 +96,19 @@ func (p *TestPorter) SetupIntegrationTest() {
 
 	// Copy test credentials into porter home, with KUBECONFIG replaced properly
 	p.AddTestFile("../build/testdata/schema.json", filepath.Join(homeDir, "schema.json"))
-	kubeconfig := p.Getenv("KUBECONFIG")
+	kubeconfig := filepath.ToSlash(p.Getenv("KUBECONFIG"))
 	if kubeconfig == "" {
 		home := p.Getenv("HOME")
-		kubeconfig = filepath.Join(home, ".kube/config")
+		kubeconfig = path.Join(home, ".kube/config")
 	}
 	ciCredsPath := filepath.Join(p.TestDir, "../build/testdata/credentials/ci.json")
 	ciCredsB, err := p.FileSystem.ReadFile(ciCredsPath)
+
 	require.NoError(t, err, "could not read test credentials %s", ciCredsPath)
 	// update the kubeconfig reference in the credentials to match what's on people's dev machine
 	ciCredsB = []byte(strings.Replace(string(ciCredsB), "KUBECONFIGPATH", kubeconfig, -1))
 	var testCreds cnabcreds.CredentialSet
-	err = yaml.Unmarshal(ciCredsB, &testCreds)
+	err = json.Unmarshal(ciCredsB, &testCreds)
 	require.NoError(t, err, "could not unmarshal test credentials %s", ciCredsPath)
 	err = p.Credentials.Save(testCreds)
 	require.NoError(t, err, "could not save test credentials")
@@ -118,6 +120,14 @@ func (p *TestPorter) AddTestFile(src string, dest string) {
 	}
 
 	p.TestConfig.TestContext.AddTestFile(src, dest)
+}
+
+func (p *TestPorter) AddTestDirectory(src string, dest string) {
+	if !filepath.IsAbs(src) {
+		src = filepath.Join(p.TestDir, src)
+	}
+
+	p.TestConfig.TestContext.AddTestDirectory(src, dest)
 }
 
 type TestDriver struct {
@@ -197,6 +207,15 @@ func (p *TestPorter) AddTestBundleDir(bundleDir string, generateUniqueName bool)
 	require.NoError(p.T(), err)
 
 	return uniqueName
+}
+
+// Copy a bundle from the Porter repository into the test's cache
+func (p *TestPorter) CacheTestBundle(srcDir string, tag string) {
+	cacheDir := p.Cache.GetCacheDir()
+	cb := cache.CachedBundle{Tag: tag}
+	destDir := filepath.Join(cacheDir, cb.GetBundleID())
+	p.AddTestDirectory(srcDir, destDir)
+	p.FileSystem.Rename(filepath.Join(destDir, ".cnab"), filepath.Join(destDir, "cnab"))
 }
 
 type TestBuildProvider struct {

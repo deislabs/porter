@@ -9,13 +9,14 @@ import (
 )
 
 func TestInstallFromTag_ManageFromClaim(t *testing.T) {
+	const tag = "getporter/porter-hello:v0.1.1"
+
 	p := NewTestPorter(t)
-	cacheDir, _ := p.Cache.GetCacheDir()
-	p.TestConfig.TestContext.AddTestDirectory("testdata/cache", cacheDir)
+	p.CacheTestBundle("../../examples/hello", tag)
 
 	installOpts := NewInstallOptions()
 	installOpts.Name = "hello"
-	installOpts.Tag = "getporter/porter-hello:v0.1.1"
+	installOpts.Tag = tag
 	err := installOpts.Validate(nil, p.Porter)
 	require.NoError(t, err, "InstallOptions.Validate failed")
 
