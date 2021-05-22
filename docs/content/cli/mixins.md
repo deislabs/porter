@@ -27,6 +27,7 @@ Mixin commands. Mixins assist with authoring bundles.
 ### SEE ALSO
 
 * [porter](/cli/porter/)	 - I am porter 👩🏽‍✈️, the friendly neighborhood CNAB authoring tool
+* [porter mixins create](/cli/porter_mixins_create/)	 - Create a new mixin project based on the getporter/skeletor repository
 * [porter mixins feed](/cli/porter_mixins_feed/)	 - Feed commands
 * [porter mixins install](/cli/porter_mixins_install/)	 - Install a mixin
 * [porter mixins list](/cli/porter_mixins_list/)	 - List installed mixins
