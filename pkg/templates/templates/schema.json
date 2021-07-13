@@ -259,10 +259,13 @@
     },
     "mixins": {
       "type": "array",
+      "minItems": 1,
       "items": {
-        "type": "string",
-        "enum": []
-      }
+        "anyOf": []
+      },
+      "additionalItems": false,
+      "uniqueItems": true,
+      "description": "A list of mixin declarations, each with optional configuration"
     },
     "name": {
       "type": "string",
